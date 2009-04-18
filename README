@@ -1,0 +1,4 @@
+Rubytest.vim
+============
+
+Rubytest.vim is a vim (http://www.vim.org) plugin, which helps you to run ruby test (including runit, rspec, shoulda etc.) in vim.
