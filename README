@@ -1,7 +1,7 @@
 Rubytest.vim
 ============
 
-Rubytest.vim is a vim (http://www.vim.org) plugin, which helps you to run ruby test (including runit, rspec, shoulda etc.) in vim.
+Rubytest.vim is a vim (http://www.vim.org) plugin, which helps you to run ruby test (including vanilla test, rspec, shoulda etc.) in vim.
 
 Installation
 ------------
@@ -23,8 +23,10 @@ $ vim test/unit/user_test.rb
 
 You can customize the command which will be used to run the test case by settting these options in your vimrc file:
 
-  let g:rubytest_cmd_test = "ruby %p --name '%c'"
-  let g:rubytest_cmd_spec = "spec -f specdoc %p -e '%c'"
+  let g:rubytest_cmd_test = "ruby %p"
+  let g:rubytest_cmd_testcase = "ruby %p -n '/%c/'"
+  let g:rubytest_cmd_spec = "spec -f specdoc %p"
+  let g:rubytest_cmd_example = "spec -f specdoc %p -e '%c'"
 
 Default Key Bindings
 --------------------
