@@ -7,3 +7,22 @@ Installation
 ------------
 
 Copy all files to your ~/.vim directory.
+
+
+Usage
+-----
+
+After installation, press <Leader>t will run the test under your cursor if you are editing a ruby test file.
+
+example:
+
+$ cd <your rails/merb root>
+$ vim test/unit/user_test.rb
+(move cursor into a test case, press <Leader>t)
+
+(<Leader> is mapping to '\' by default in vim)
+
+You can customize the command which will be used to run the test case by settting these options in your vimrc file:
+
+  let g:rubytest_cmd_test = "ruby %p --name '%c'"
+  let g:rubytest_cmd_spec = "spec -f specdoc %p -e '%c'"

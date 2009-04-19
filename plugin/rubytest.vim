@@ -8,6 +8,13 @@ if exists("rubytest_loaded")
 endif
 let rubytest_loaded = 1
 
+if !exists("g:rubytest_cmd_test")
+  let g:rubytest_cmd_test = "ruby %p --name '%c'"
+endif
+if !exists("g:rubytest_cmd_spec")
+  let g:rubytest_cmd_spec = "spec -f specdoc %p -e '%c'"
+endif
+
 function s:FindCase(patterns)
   let ln = a:firstline
   while ln > 0
@@ -25,10 +32,13 @@ endfunction
 function s:RunTest()
   let case = s:FindCase(s:test_case_patterns['test'])
   if case != 'false'
+    let cmd = substitute(g:rubytest_cmd_test, '%c', case, '')
     if @% =~ '^test'
-      exe "!echo 'running case " . case . "' && cd test && ruby " . strpart(@%,5) . " --name " . case
+      let cmd = substitute(cmd, '%p', strpart(@%,5), '')
+      exe "!echo '" . cmd . "' && cd test && " . cmd
     else
-      exe "!echo 'running case " . case . "' && ruby " . @% . " --name " . case
+      let cmd = substitute(cmd, '%p', @%, '')
+      exe "!echo '" . cmd . "' && " . cmd
     end
   else
     echo 'No test case found.'
@@ -38,7 +48,9 @@ endfunction
 function s:RunSpec()
   let case = s:FindCase(s:test_case_patterns['spec'])
   if case != 'false'
-    exe "!echo 'running spec \"" . case . "\"' && spec " . @% . " -e '" . case . "'"
+    let cmd = substitute(g:rubytest_cmd_spec, '%c', case, '')
+    let cmd = substitute(cmd, '%p', @%, '')
+    exe "!echo '" . cmd . "' && " . cmd
   else
     echo 'No spec found.'
   end
