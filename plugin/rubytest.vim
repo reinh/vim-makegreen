@@ -9,7 +9,7 @@ endif
 let rubytest_loaded = 1
 
 if !exists("g:rubytest_cmd_test")
-  let g:rubytest_cmd_test = "ruby %p --name '%c'"
+  let g:rubytest_cmd_test = "ruby %p -n '/%c/'"
 endif
 if !exists("g:rubytest_cmd_spec")
   let g:rubytest_cmd_spec = "spec -f specdoc %p -e '%c'"
@@ -68,12 +68,16 @@ function s:GetTestCaseName2(str)
   return "test_" . join(split(split(a:str, '"')[1]), '_')
 endfunction
 
+function s:GetTestCaseName3(str)
+  return split(a:str, '"')[1]
+endfunction
+
 function s:GetSpecName1(str)
   return split(a:str, '"')[1]
 endfunction
 
 let s:test_case_patterns = {}
-let s:test_case_patterns['test'] = {'^\s*def test':function('s:GetTestCaseName1'), '^\s*test \s*"':function('s:GetTestCaseName2')}
+let s:test_case_patterns['test'] = {'^\s*def test':function('s:GetTestCaseName1'), '^\s*test \s*"':function('s:GetTestCaseName2'), '^\s*should \s*"':function('s:GetTestCaseName3')}
 let s:test_case_patterns['spec'] = {'^\s*it \s*"':function('s:GetSpecName1')}
 
 let s:save_cpo = &cpo
