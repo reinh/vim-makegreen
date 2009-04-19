@@ -9,10 +9,16 @@ endif
 let rubytest_loaded = 1
 
 if !exists("g:rubytest_cmd_test")
-  let g:rubytest_cmd_test = "ruby %p -n '/%c/'"
+  let g:rubytest_cmd_test = "ruby %p"
+endif
+if !exists("g:rubytest_cmd_testcase")
+  let g:rubytest_cmd_testcase = "ruby %p -n '/%c/'"
 endif
 if !exists("g:rubytest_cmd_spec")
-  let g:rubytest_cmd_spec = "spec -f specdoc %p -e '%c'"
+  let g:rubytest_cmd_spec = "spec -f specdoc %p"
+endif
+if !exists("g:rubytest_cmd_example")
+  let g:rubytest_cmd_example = "spec -f specdoc %p -e '%c'"
 endif
 
 function s:FindCase(patterns)
@@ -30,9 +36,15 @@ function s:FindCase(patterns)
 endfunction
 
 function s:RunTest()
+  if s:test_scope == 1
+    let cmd = g:rubytest_cmd_testcase
+  elseif s:test_scope == 2
+    let cmd = g:rubytest_cmd_test
+  end
+
   let case = s:FindCase(s:test_case_patterns['test'])
   if case != 'false'
-    let cmd = substitute(g:rubytest_cmd_test, '%c', case, '')
+    let cmd = substitute(cmd, '%c', case, '')
     if @% =~ '^test'
       let cmd = substitute(cmd, '%p', strpart(@%,5), '')
       exe "!echo '" . cmd . "' && cd test && " . cmd
@@ -46,9 +58,15 @@ function s:RunTest()
 endfunction
 
 function s:RunSpec()
+  if s:test_scope == 1
+    let cmd = g:rubytest_cmd_example
+  elseif s:test_scope == 2
+    let cmd = g:rubytest_cmd_spec
+  endif
+
   let case = s:FindCase(s:test_case_patterns['spec'])
   if case != 'false'
-    let cmd = substitute(g:rubytest_cmd_spec, '%c', case, '')
+    let cmd = substitute(cmd, '%c', case, '')
     let cmd = substitute(cmd, '%p', @%, '')
     exe "!echo '" . cmd . "' && " . cmd
   else
@@ -86,6 +104,9 @@ set cpo&vim
 if !hasmapto('<Plug>RubyTestRun')
   map <unique> <Leader>t <Plug>RubyTestRun
 endif
+if !hasmapto('<Plug>RubyFileRun')
+  map <unique> <Leader>T <Plug>RubyFileRun
+endif
 
 function s:IsRubyTest()
   for pattern in keys(s:test_patterns)
@@ -96,17 +117,23 @@ function s:IsRubyTest()
   endfor
 endfunction
 
-function s:Run()
+function s:Run(scope)
   if &filetype != "ruby"
     echo "This file doens't contain ruby source."
   elseif !s:IsRubyTest()
     echo "This file doesn't contain ruby test."
   else
+    " test scope define what to test
+    " 1: test case under cursor
+    " 2: all tests in file
+    let s:test_scope = a:scope
     call s:test_patterns[s:pattern]()
   endif
 endfunction
 
 noremap <unique> <script> <Plug>RubyTestRun <SID>Run
-noremap <SID>Run :call <SID>Run()<CR>
+noremap <unique> <script> <Plug>RubyFileRun <SID>RunFile
+noremap <SID>Run :call <SID>Run(1)<CR>
+noremap <SID>RunFile :call <SID>Run(2)<CR>
 
 let &cpo = s:save_cpo
