@@ -28,8 +28,16 @@ You can customize the command which will be used to run the test case by setttin
   let g:rubytest_cmd_spec = "spec -f specdoc %p"
   let g:rubytest_cmd_example = "spec -f specdoc %p -e '%c'"
 
+(%p will be replaced by the path of test file, %c will be replaced by the name of test case under cursor)
+
 Default Key Bindings
 --------------------
 
 <Leader>t: run test case under cursor
 <Leader>T: run all tests in file
+
+You can change default key bindings:
+
+  map <Leader>\ <Plug>RubyTestRun " change from <Leader>t to <Leader>\
+  map <Leader>] <Plug>RubyFileRun " change from <Leader>T to <Leader>]
+
