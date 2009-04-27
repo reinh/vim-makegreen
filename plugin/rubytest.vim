@@ -79,7 +79,7 @@ let s:test_patterns['_test.rb$'] = function('s:RunTest')
 let s:test_patterns['_spec.rb$'] = function('s:RunSpec')
 
 function s:GetTestCaseName1(str)
-  return split(str)[1]
+  return split(a:str)[1]
 endfunction
 
 function s:GetTestCaseName2(str)
