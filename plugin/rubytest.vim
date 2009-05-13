@@ -1,5 +1,5 @@
-" Vim filetype plugin for running ruby tests
-" Last Change: Apr 19 2009
+" Vim plugin for running ruby tests
+" Last Change: May 13 2009
 " Maintainer: Jan <jan.h.xie@gmail.com>
 " License: MIT License
 
