@@ -144,7 +144,7 @@ noremap <unique> <script> <Plug>RubyFileRun <SID>RunFile
 noremap <SID>Run :call <SID>Run(1)<CR>
 noremap <SID>RunFile :call <SID>Run(2)<CR>
 
-let s:efm='%A%\\d%\\+)$,'
+let s:efm='%A%\\d%\\+)%.%#,'
 
 " below errorformats are copied from rails.vim
 " Current directory
