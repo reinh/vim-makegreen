@@ -72,8 +72,13 @@ function s:RunSpec()
     let cmd = substitute(cmd, '%c', case, '')
     let cmd = substitute(cmd, '%p', @%, '')
     if g:rubytest_in_quickfix > 0
+      let s:oldefm = &efm
+      let &efm = s:efm . s:efm_backtrace . ',' . s:efm_ruby . ',' . s:oldefm . ',%-G%.%#'
+
       cex system(cmd)
       cw
+
+      let &efm = s:oldefm
     else
       exe "!echo '" . cmd . "' && " . cmd
     endif
@@ -204,8 +209,5 @@ let s:efm_backtrace='%D(in\ %f),'
       \.'%\\s%#%f:%l:\ %#%m'
 
 let s:efm_ruby='\%-E-e:%.%#,\%+E%f:%l:\ parse\ error,%W%f:%l:\ warning:\ %m,%E%f:%l:in\ %*[^:]:\ %m,%E%f:%l:\ %m,%-C%\tfrom\ %f:%l:in\ %.%#,%-Z%\tfrom\ %f:%l,%-Z%p^'
-
-let s:oldefm = &efm
-let &efm = s:efm . s:efm_backtrace . ',' . s:efm_ruby . ',' . s:oldefm . ',%-G%.%#'
 
 let &cpo = s:save_cpo
