@@ -21,7 +21,7 @@ $ vim test/unit/user_test.rb
 
 (<Leader> is mapping to '\' by default in vim)
 
-By default, only test errors will be shown to you. If some of your tests failed, the errors will be displayed in vim's quickfix window, and you can quick jump to the place where the error raise in source file by moving cursor onto the error message and press return. If you don't want quickfix, just want to run tests and get results you can set g:rubytest_in_quickfix to 0 in your .vimrc file:
+By default, only test errors will be shown to you. If some of your tests failed, the errors will be displayed in vim's quickfix window, and you can quick jump to the place where the error raise in source file by moving cursor onto the error message and press return (or ctrl-w return to open a new window and jump). If you don't want quickfix, just want to run tests and get results you can set g:rubytest_in_quickfix to 0 in your .vimrc file:
 
   let g:rubytest_in_quickfix = 0
 

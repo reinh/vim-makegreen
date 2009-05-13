@@ -73,7 +73,7 @@ function s:RunSpec()
     let cmd = substitute(cmd, '%p', @%, '')
     if g:rubytest_in_quickfix > 0
       cex system(cmd)
-      cope
+      cw
     else
       exe "!echo '" . cmd . "' && " . cmd
     endif
