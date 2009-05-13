@@ -144,9 +144,11 @@ noremap <unique> <script> <Plug>RubyFileRun <SID>RunFile
 noremap <SID>Run :call <SID>Run(1)<CR>
 noremap <SID>RunFile :call <SID>Run(2)<CR>
 
-" errorformat settings is copied from rails.vim
+let s:efm='%A%\\d%\\+)$,'
+
+" below errorformats are copied from rails.vim
 " Current directory
-let s:efm='%D(in\ %f),'
+let s:efm=s:efm . '%D(in\ %f),'
 " Failure and Error headers, start a multiline message
 let s:efm=s:efm
       \.'%A\ %\\+%\\d%\\+)\ Failure:,'
@@ -194,9 +196,6 @@ let s:efm=s:efm
 let s:efm=s:efm
       \.'%-G%\\s%#from\ %.%#,'
       \.'%f:%l:\ %#%m,'
-" Drop everything else
-let s:efm=s:efm
-      \.'%-G%.%#'
 
 let s:efm_backtrace='%D(in\ %f),'
       \.'%\\s%#from\ %f:%l:%m,'
@@ -204,9 +203,9 @@ let s:efm_backtrace='%D(in\ %f),'
       \.'%\\s%#[%f:%l:\ %#%m,'
       \.'%\\s%#%f:%l:\ %#%m'
 
-let s:efm_ruby='\%-E-e:%.%#,\%+E%f:%l:\ parse\ error,%W%f:%l:\ warning:\ %m,%E%f:%l:in\ %*[^:]:\ %m,%E%f:%l:\ %m,%-C%\tfrom\ %f:%l:in\ %.%#,%-Z%\tfrom\ %f:%l,%-Z%p^,%-G%.%#'
+let s:efm_ruby='\%-E-e:%.%#,\%+E%f:%l:\ parse\ error,%W%f:%l:\ warning:\ %m,%E%f:%l:in\ %*[^:]:\ %m,%E%f:%l:\ %m,%-C%\tfrom\ %f:%l:in\ %.%#,%-Z%\tfrom\ %f:%l,%-Z%p^'
 
 let s:oldefm = &efm
-let &efm = s:efm . ',' . s:efm_backtrace . ',' . s:efm_ruby . ',' . s:oldefm
+let &efm = s:efm . s:efm_backtrace . ',' . s:efm_ruby . ',' . s:oldefm . ',%-G%.%#'
 
 let &cpo = s:save_cpo
