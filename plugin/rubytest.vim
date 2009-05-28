@@ -47,7 +47,7 @@ function s:RunTest()
 
   let case = s:FindCase(s:test_case_patterns['test'])
   if case != 'false'
-    let case = substitute(s:FindCase(s:test_case_patterns['test']), "'\\|\"", '.', '')
+    let case = substitute(s:FindCase(s:test_case_patterns['test']), "'\\|\"", '.', 'g')
     let cmd = substitute(cmd, '%c', case, '')
     if @% =~ '^test'
       let cmd = substitute(cmd, '%p', strpart(@%,5), '')
