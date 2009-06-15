@@ -47,7 +47,7 @@ function s:RunTest()
 
   let case = s:FindCase(s:test_case_patterns['test'])
   if case != 'false'
-    let case = substitute(s:FindCase(s:test_case_patterns['test']), "'\\|\"", '.', 'g')
+    let case = substitute(case, "'\\|\"", '.', 'g')
     let cmd = substitute(cmd, '%c', case, '')
     if @% =~ '^test'
       let cmd = substitute(cmd, '%p', strpart(@%,5), '')
@@ -121,8 +121,8 @@ function s:GetSpecName2(str)
 endfunction
 
 let s:test_case_patterns = {}
-let s:test_case_patterns['test'] = {'^\s*def test':function('s:GetTestCaseName1'), '^\s*test \s*"':function('s:GetTestCaseName2'), "^\\s*test \\s*'":function('s:GetTestCaseName4'), '^\s*should \s*"':function('s:GetTestCaseName3'), "^\s*should \s*'":function('s:GetTestCaseName5')}
-let s:test_case_patterns['spec'] = {'^\s*it \s*"':function('s:GetSpecName1'), "^\s*it \s*'":function('s:GetSpecName2')}
+let s:test_case_patterns['test'] = {'^\s*def test':function('s:GetTestCaseName1'), '^\s*test \s*"':function('s:GetTestCaseName2'), "^\\s*test \\s*'":function('s:GetTestCaseName4'), '^\s*should \s*"':function('s:GetTestCaseName3'), "^\\s*should \\s*'":function('s:GetTestCaseName5')}
+let s:test_case_patterns['spec'] = {'^\s*\(it\|example\) \s*"':function('s:GetSpecName1'), "^\\s*\\(it\\|example\\) \\s*'":function('s:GetSpecName2')}
 
 let s:save_cpo = &cpo
 set cpo&vim
