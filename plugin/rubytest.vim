@@ -21,7 +21,7 @@ if !exists("g:rubytest_cmd_spec")
   let g:rubytest_cmd_spec = "spec -f specdoc %p"
 endif
 if !exists("g:rubytest_cmd_example")
-  let g:rubytest_cmd_example = "spec -f specdoc %p -e '%c'"
+  let g:rubytest_cmd_example = "spec -f specdoc %p -l %c"
 endif
 
 function s:FindCase(patterns)
@@ -30,7 +30,11 @@ function s:FindCase(patterns)
     let line = getline(ln)
     for pattern in keys(a:patterns)
       if line =~ pattern
-        return a:patterns[pattern](line)
+        if s:pattern == '_spec.rb$'
+          return a:patterns[pattern](ln)
+        else
+          return a:patterns[pattern](line)
+        endif
       endif
     endfor
     let ln -= 1
@@ -112,17 +116,13 @@ function s:GetTestCaseName5(str)
   return split(a:str, "'")[1]
 endfunction
 
-function s:GetSpecName1(str)
-  return split(a:str, '"')[1]
-endfunction
-
-function s:GetSpecName2(str)
-  return split(a:str, "'")[1]
+function s:GetSpecLine(str)
+  return a:str
 endfunction
 
 let s:test_case_patterns = {}
 let s:test_case_patterns['test'] = {'^\s*def test':function('s:GetTestCaseName1'), '^\s*test \s*"':function('s:GetTestCaseName2'), "^\\s*test \\s*'":function('s:GetTestCaseName4'), '^\s*should \s*"':function('s:GetTestCaseName3'), "^\\s*should \\s*'":function('s:GetTestCaseName5')}
-let s:test_case_patterns['spec'] = {'^\s*\(it\|example\) \s*"':function('s:GetSpecName1'), "^\\s*\\(it\\|example\\) \\s*'":function('s:GetSpecName2')}
+let s:test_case_patterns['spec'] = {'^\s*\(it\|example\) \s*':function('s:GetSpecLine')}
 
 let s:save_cpo = &cpo
 set cpo&vim
