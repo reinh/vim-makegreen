@@ -42,6 +42,11 @@ function s:FindCase(patterns)
   return 'false'
 endfunction
 
+
+function s:EscapeBackSlash(str)
+  return substitute(a:str, '\', '\\\\', 'g') 
+endfunction
+
 function s:RunTest()
   if s:test_scope == 1
     let cmd = g:rubytest_cmd_testcase
@@ -54,10 +59,10 @@ function s:RunTest()
     let case = substitute(case, "'\\|\"", '.', 'g')
     let cmd = substitute(cmd, '%c', case, '')
     if @% =~ '^test'
-      let cmd = substitute(cmd, '%p', strpart(@%,5), '')
+      let cmd = substitute(cmd, '%p', s:EscapeBackSlash(strpart(@%,5)), '')
       exe "!echo '" . cmd . "' && cd test && " . cmd
     else
-      let cmd = substitute(cmd, '%p', @%, '')
+      let cmd = substitute(cmd, '%p', s:EscapeBackSlash(@%), '')
       exe "!echo '" . cmd . "' && " . cmd
     end
   else
@@ -75,7 +80,7 @@ function s:RunSpec()
   let case = s:FindCase(s:test_case_patterns['spec'])
   if case != 'false'
     let cmd = substitute(cmd, '%c', case, '')
-    let cmd = substitute(cmd, '%p', @%, '')
+    let cmd = substitute(cmd, '%p', s:EscapeBackSlash(@%), '')
     if g:rubytest_in_quickfix > 0
       let s:oldefm = &efm
       let &efm = s:efm . s:efm_backtrace . ',' . s:efm_ruby . ',' . s:oldefm . ',%-G%.%#'
