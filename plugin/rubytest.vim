@@ -11,6 +11,9 @@ let rubytest_loaded = 1
 if !exists("g:rubytest_in_quickfix")
   let g:rubytest_in_quickfix = 1
 endif
+if !exists("g:rubytest_spec_drb")
+  let g:rubytest_spec_drb = 0
+endif
 if !exists("g:rubytest_cmd_test")
   let g:rubytest_cmd_test = "ruby %p"
 endif
@@ -75,6 +78,10 @@ function s:RunSpec()
     let cmd = g:rubytest_cmd_example
   elseif s:test_scope == 2
     let cmd = g:rubytest_cmd_spec
+  endif
+
+  if g:rubytest_spec_drb > 0
+    let cmd = cmd . " --drb"
   endif
 
   let case = s:FindCase(s:test_case_patterns['spec'])
