@@ -19,6 +19,17 @@ function s:EscapeBackSlash(str)
   return substitute(a:str, '\', '\\\\', 'g') 
 endfunction
 
+function s:RunTest()
+  let cmd = g:rubytest_cmd_test
+
+    let cmd = substitute(cmd, '%p', s:EscapeBackSlash(@%), '')
+
+    let s:oldefm = &efm
+    let &efm = s:efm . s:efm_backtrace . ',' . s:efm_ruby . ',' . s:oldefm . ',%-G%.%#'
+    cex system(cmd)
+    let &efm = s:oldefm
+endfunction
+
 function s:RunSpec()
   let cmd = g:rubytest_cmd_spec
 
