@@ -8,143 +8,34 @@ if exists("rubytest_loaded")
 endif
 let rubytest_loaded = 1
 
-if !exists("g:rubytest_in_quickfix")
-  let g:rubytest_in_quickfix = 1
-endif
-if !exists("g:rubytest_spec_drb")
-  let g:rubytest_spec_drb = 0
-endif
 if !exists("g:rubytest_cmd_test")
   let g:rubytest_cmd_test = "ruby %p"
-endif
-if !exists("g:rubytest_cmd_testcase")
-  let g:rubytest_cmd_testcase = "ruby %p -n '/%c/'"
 endif
 if !exists("g:rubytest_cmd_spec")
   let g:rubytest_cmd_spec = "spec -f specdoc %p"
 endif
-if !exists("g:rubytest_cmd_example")
-  let g:rubytest_cmd_example = "spec -f specdoc %p -l %c"
-endif
-
-function s:FindCase(patterns)
-  let ln = a:firstline
-  while ln > 0
-    let line = getline(ln)
-    for pattern in keys(a:patterns)
-      if line =~ pattern
-        if s:pattern == '_spec.rb$'
-          return a:patterns[pattern](ln)
-        else
-          return a:patterns[pattern](line)
-        endif
-      endif
-    endfor
-    let ln -= 1
-  endwhile
-  return 'false'
-endfunction
-
 
 function s:EscapeBackSlash(str)
   return substitute(a:str, '\', '\\\\', 'g') 
 endfunction
 
-function s:RunTest()
-  if s:test_scope == 1
-    let cmd = g:rubytest_cmd_testcase
-  elseif s:test_scope == 2
-    let cmd = g:rubytest_cmd_test
-  end
-
-  let case = s:FindCase(s:test_case_patterns['test'])
-  if case != 'false'
-    let case = substitute(case, "'\\|\"", '.', 'g')
-    let cmd = substitute(cmd, '%c', case, '')
-    if @% =~ '^test'
-      let cmd = substitute(cmd, '%p', s:EscapeBackSlash(strpart(@%,5)), '')
-      exe "!echo '" . cmd . "' && cd test && " . cmd
-    else
-      let cmd = substitute(cmd, '%p', s:EscapeBackSlash(@%), '')
-      exe "!echo '" . cmd . "' && " . cmd
-    end
-  else
-    echo 'No test case found.'
-  endif
-endfunction
-
 function s:RunSpec()
-  if s:test_scope == 1
-    let cmd = g:rubytest_cmd_example
-  elseif s:test_scope == 2
-    let cmd = g:rubytest_cmd_spec
-  endif
+  let cmd = g:rubytest_cmd_spec
 
-  if g:rubytest_spec_drb > 0
-    let cmd = cmd . " --drb"
-  endif
-
-  let case = s:FindCase(s:test_case_patterns['spec'])
-  if case != 'false'
-    let cmd = substitute(cmd, '%c', case, '')
     let cmd = substitute(cmd, '%p', s:EscapeBackSlash(@%), '')
-    if g:rubytest_in_quickfix > 0
-      let s:oldefm = &efm
-      let &efm = s:efm . s:efm_backtrace . ',' . s:efm_ruby . ',' . s:oldefm . ',%-G%.%#'
 
-      cex system(cmd)
-      cw
-
-      let &efm = s:oldefm
-    else
-      exe "!echo '" . cmd . "' && " . cmd
-    endif
-  else
-    echo 'No spec found.'
-  endif
+    let s:oldefm = &efm
+    let &efm = s:efm . s:efm_backtrace . ',' . s:efm_ruby . ',' . s:oldefm . ',%-G%.%#'
+    cex system(cmd)
+    let &efm = s:oldefm
 endfunction
 
 let s:test_patterns = {}
 let s:test_patterns['_test.rb$'] = function('s:RunTest')
 let s:test_patterns['_spec.rb$'] = function('s:RunSpec')
 
-function s:GetTestCaseName1(str)
-  return split(a:str)[1]
-endfunction
-
-function s:GetTestCaseName2(str)
-  return "test_" . join(split(split(a:str, '"')[1]), '_')
-endfunction
-
-function s:GetTestCaseName3(str)
-  return split(a:str, '"')[1]
-endfunction
-
-function s:GetTestCaseName4(str)
-  return "test_" . join(split(split(a:str, "'")[1]), '_')
-endfunction
-
-function s:GetTestCaseName5(str)
-  return split(a:str, "'")[1]
-endfunction
-
-function s:GetSpecLine(str)
-  return a:str
-endfunction
-
-let s:test_case_patterns = {}
-let s:test_case_patterns['test'] = {'^\s*def test':function('s:GetTestCaseName1'), '^\s*test \s*"':function('s:GetTestCaseName2'), "^\\s*test \\s*'":function('s:GetTestCaseName4'), '^\s*should \s*"':function('s:GetTestCaseName3'), "^\\s*should \\s*'":function('s:GetTestCaseName5')}
-let s:test_case_patterns['spec'] = {'^\s*\(it\|example\) \s*':function('s:GetSpecLine')}
-
 let s:save_cpo = &cpo
 set cpo&vim
-
-if !hasmapto('<Plug>RubyTestRun')
-  map <unique> <Leader>t <Plug>RubyTestRun
-endif
-if !hasmapto('<Plug>RubyFileRun')
-  map <unique> <Leader>T <Plug>RubyFileRun
-endif
 
 function s:IsRubyTest()
   for pattern in keys(s:test_patterns)
@@ -155,26 +46,62 @@ function s:IsRubyTest()
   endfor
 endfunction
 
-function s:Run(scope)
+" TESTING RED GREEN BAR
+function! JumpToError()
+    if getqflist() != []
+        for error in getqflist()
+            if error['valid']
+                break
+            endif
+        endfor
+        let error_message = substitute(error['text'], '^ *', '', 'g')
+        let error_message = substitute(error_message, "\n", ' ', 'g')
+        let error_message = substitute(error_message, "  *", ' ', 'g')
+        silent cc!
+        call s:RedBar(error_message)
+    else
+        call s:GreenBar()
+    endif
+endfunction
+
+function s:EchonPadded(msg)
+  echon a:msg
+  echon repeat(" ",&columns - strlen(a:msg))
+endfunction
+
+function s:RedBar(msg)
+    hi RedBar term=reverse ctermfg=white ctermbg=red guifg=white guibg=red
+    echohl RedBar
+    call s:EchonPadded(a:msg)
+    echohl
+endfunction
+
+function s:GreenBar()
+    hi GreenBar term=reverse ctermfg=white ctermbg=green guifg=white guibg=green
+    echohl GreenBar
+    call s:EchonPadded('All tests passed')
+    echohl
+endfunction
+
+function s:RunFile()
   if &filetype != "ruby"
     echo "This file doens't contain ruby source."
   elseif !s:IsRubyTest()
     echo "This file doesn't contain ruby test."
   else
-    " test scope define what to test
-    " 1: test case under cursor
-    " 2: all tests in file
-    let s:test_scope = a:scope
     call s:test_patterns[s:pattern]()
   endif
 endfunction
 
-noremap <unique> <script> <Plug>RubyTestRun <SID>Run
 noremap <unique> <script> <Plug>RubyFileRun <SID>RunFile
-noremap <SID>Run :call <SID>Run(1)<CR>
-noremap <SID>RunFile :call <SID>Run(2)<CR>
+noremap <SID>RunFile :call <SID>RunFile()<CR>
 
-let s:efm='%A%\\d%\\+)%.%#,'
+if !hasmapto('<Plug>RubyFileRun')
+  map <unique> <silent> <Leader>t <Plug>RubyFileRun<cr>:redraw<cr>:call JumpToError()<cr>
+endif
+
+" Error formats
+let s:efm='%-G%\\d%\\+)%.%#,'
 
 " below errorformats are copied from rails.vim
 " Current directory
