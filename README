@@ -21,7 +21,7 @@ $ cd <your rails/merb root>
 $ vim test/unit/user_test.rb
 (move cursor into a test case, press <Leader>t)
 
-(<Leader> is mapping to '\' by default in vim)
+(<Leader> is mapped to '\' by default in vim)
 
 
 Default Key Bindings
