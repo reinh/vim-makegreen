@@ -36,10 +36,11 @@ You can change default key bindings:
 Credits
 -------
 
-Based on code from the rubytest.vim plugin (http://github.com/reinh/vim-rubytest)
-but considerably refactored and modified for this more specific purpose.
+- Based on code from the rubytest.vim plugin
+  (http://github.com/reinh/vim-rubytest) but considerably refactored and
+  modified for this more specific purpose.
 
-Red/Green bar code borrowed from Gary Bernhardt
-(http://bitbucket.org/garybernhardt/dotfiles/src/tip/.vimrc) and slightly
-modified for my use. Please do check out Gary's coding videos on his blog for
-more awesome vim usage (http://blog.extracheese.org/).
+- Red/Green bar code borrowed from Gary Bernhardt
+  (http://bitbucket.org/garybernhardt/dotfiles/src/tip/.vimrc) and slightly
+  modified for my use. Please do check out Gary's coding videos on his blog
+  for more awesome vim usage (http://blog.extracheese.org/).
