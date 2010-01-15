@@ -114,11 +114,11 @@ let s:efm=s:efm
       \.'%+A'."'".'%.%#'."'".'\ FAILED,'
 " Exclusions
 let s:efm=s:efm
-      \.'%C%.%#(eval)%.%#,'
-      \.'%C-e:%.%#,'
-      \.'%C%.%#/lib/gems/%\\d.%\\d/gems/%.%#,'
-      \.'%C%.%#/lib/ruby/%\\d.%\\d/%.%#,'
-      \.'%C%.%#/vendor/rails/%.%#,'
+      \.'%-C%.%#(eval)%.%#,'
+      \.'%-C-e:%.%#,'
+      \.'%-C%.%#/lib/gems/%\\d.%\\d/gems/%.%#,'
+      \.'%-C%.%#/lib/ruby/%\\d.%\\d/%.%#,'
+      \.'%-C%.%#/vendor/rails/%.%#,'
 " Specific to template errors
 let s:efm=s:efm
       \.'%C\ %\\+On\ line\ #%l\ of\ %f,'
