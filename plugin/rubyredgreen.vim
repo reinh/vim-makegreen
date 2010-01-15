@@ -1,83 +1,82 @@
-" Vim plugin for running ruby tests
-" Last Change: May 13 2009
-" Maintainer: Jan <jan.h.xie@gmail.com>
-" License: MIT License
+" plugin/rubyredgreen.vim
+" Author:   Rein Henrichs <reinh@reinh.com>
+" License:  MIT License
 
-if exists("rubytest_loaded")
+" Install this file as plugin/rubyredgreen.vim.
+
+" ============================================================================
+
+" Exit quickly when:
+" - this plugin was already loaded (or disabled)
+" - when 'compatible' is set
+if &cp || exists("g:rubyredgreen_loaded") && g:rubyredgreen_loaded
   finish
 endif
-let rubytest_loaded = 1
-
-if !exists("g:rubytest_cmd_test")
-  let g:rubytest_cmd_test = "ruby %p"
-endif
-if !exists("g:rubytest_cmd_spec")
-  let g:rubytest_cmd_spec = "spec -f specdoc %p"
-endif
-
-function s:EscapeBackSlash(str)
-  return substitute(a:str, '\', '\\\\', 'g') 
-endfunction
-
-function s:RunTest()
-  let cmd = g:rubytest_cmd_test
-
-    let cmd = substitute(cmd, '%p', s:EscapeBackSlash(@%), '')
-
-    let s:oldefm = &efm
-    let &efm = s:efm . s:efm_backtrace . ',' . s:efm_ruby . ',' . s:oldefm . ',%-G%.%#'
-    cex system(cmd)
-    let &efm = s:oldefm
-endfunction
-
-function s:RunSpec()
-  let cmd = g:rubytest_cmd_spec
-
-    let cmd = substitute(cmd, '%p', s:EscapeBackSlash(@%), '')
-
-    let s:oldefm = &efm
-    let &efm = s:efm . s:efm_backtrace . ',' . s:efm_ruby . ',' . s:oldefm . ',%-G%.%#'
-    cex system(cmd)
-    let &efm = s:oldefm
-endfunction
-
-let s:test_patterns = {}
-let s:test_patterns['_test.rb$'] = function('s:RunTest')
-let s:test_patterns['_spec.rb$'] = function('s:RunSpec')
+let g:rubyredgreen_loaded = 1
 
 let s:save_cpo = &cpo
 set cpo&vim
 
-function s:IsRubyTest()
-  for pattern in keys(s:test_patterns)
-    if @% =~ pattern
-      let s:pattern = pattern
-      return 1
-    endif
-  endfor
+function s:RunTests() "{{{1
+  " should be ftplugin?
+  if &filetype != "ruby"
+    return 0
+  endif
+
+  let cmd = s:GetTestCmd()
+  if cmd == ''
+    echo "This file doesn't contain ruby tests"
+    return 0
+  endif
+
+  call s:RubyCex(cmd)
+
+  let error = s:GetFirstError()
+  if error != ''
+    silent cc!
+    call s:RedBar(error)
+  else
+    call s:GreenBar()
+  endif
+endfunction
+"}}}1
+" Utility Functions" {{{1
+function s:EscapeBackSlash(str)
+  return substitute(a:str, '\', '\\\\', 'g') 
 endfunction
 
-" TESTING RED GREEN BAR
-function! JumpToError()
-    if getqflist() != []
-        for error in getqflist()
-            if error['valid']
-                break
-            endif
-        endfor
-        let error_message = substitute(error['text'], '^ *', '', 'g')
-        let error_message = substitute(error_message, "\n", ' ', 'g')
-        let error_message = substitute(error_message, "  *", ' ', 'g')
-        silent cc!
-        call s:RedBar(error_message)
-    else
-        call s:GreenBar()
+function s:GetTestCmd()
+  let test_patterns = {}
+  let test_patterns['_test.rb$'] = "ruby %p"
+  let test_patterns['_spec.rb$'] = "spec -f specdoc %p"
+
+  for [pattern, cmd] in items(test_patterns)
+    if @% =~ pattern
+      return substitute(cmd, '%p', s:EscapeBackSlash(@%), '')
     endif
+  endfor
+  return ''
+endfunction
+
+function s:GetFirstError()
+  if getqflist() == []
+    return ''
+  endif
+
+  for error in getqflist()
+    if error['valid']
+      break
+    endif
+  endfor
+  let error_message = substitute(error['text'], '^ *', '', 'g')
+  let error_message = substitute(error_message, "\n", ' ', 'g')
+  let error_message = substitute(error_message, "  *", ' ', 'g')
+  return error_message
 endfunction
 
 function s:EchonPadded(msg)
   echon a:msg
-  echon repeat(" ",&columns - strlen(a:msg))
+  echon repeat(" ", &columns - strlen(a:msg))
 endfunction
 
 function s:RedBar(msg)
@@ -94,24 +93,15 @@ function s:GreenBar()
     echohl
 endfunction
 
-function s:RunFile()
-  if &filetype != "ruby"
-    echo "This file doens't contain ruby source."
-  elseif !s:IsRubyTest()
-    echo "This file doesn't contain ruby test."
-  else
-    call s:test_patterns[s:pattern]()
-  endif
+function s:RubyCex(cmd)
+  let oldefm = &efm
+  let &efm = s:efm . s:efm_backtrace . ',' . s:efm_ruby . ',' . oldefm . ',%-G%.%#'
+  silent cex system(a:cmd)
+  let &efm = oldefm
 endfunction
 
-noremap <unique> <script> <Plug>RubyFileRun <SID>RunFile
-noremap <SID>RunFile :call <SID>RunFile()<CR>
-
-if !hasmapto('<Plug>RubyFileRun')
-  map <unique> <silent> <Leader>t <Plug>RubyFileRun<cr>:redraw<cr>:call JumpToError()<cr>
-endif
-
-" Error formats
+" }}}1
+" Error formats" {{{1
 let s:efm='%-G%\\d%\\+)%.%#,'
 
 " below errorformats are copied from rails.vim
@@ -172,5 +162,16 @@ let s:efm_backtrace='%D(in\ %f),'
       \.'%\\s%#%f:%l:\ %#%m'
 
 let s:efm_ruby='\%-E-e:%.%#,\%+E%f:%l:\ parse\ error,%W%f:%l:\ warning:\ %m,%E%f:%l:in\ %*[^:]:\ %m,%E%f:%l:\ %m,%-C%\tfrom\ %f:%l:in\ %.%#,%-Z%\tfrom\ %f:%l,%-Z%p^'
+" }}}1
+" Mappings" {{{1
+noremap <unique> <script> <Plug>RubyFileRun <SID>RunFile
+noremap <SID>RunFile :call <SID>RunTests()<CR>
+
+if !hasmapto('<Plug>RubyFileRun')
+  map <unique> <silent> <Leader>t <Plug>RubyFileRun
+endif
+" }}}1
 
 let &cpo = s:save_cpo
+
+" vim:set sw=2 sts=2:
