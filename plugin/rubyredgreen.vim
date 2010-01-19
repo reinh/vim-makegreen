@@ -118,7 +118,7 @@ let s:efm=s:efm
       \.'%-C-e:%.%#,'
       \.'%-C%.%#/lib/gems/%\\d.%\\d/gems/%.%#,'
       \.'%-C%.%#/lib/ruby/%\\d.%\\d/%.%#,'
-      \.'%-C%.%#/vendor/rails/%.%#,'
+      \.'%-C%.%#/vendor/%.%#,'
 " Specific to template errors
 let s:efm=s:efm
       \.'%C\ %\\+On\ line\ #%l\ of\ %f,'
@@ -148,7 +148,7 @@ let s:efm=s:efm
 let s:efm=s:efm
       \.'%-G%.%#/lib/gems/%\\d.%\\d/gems/%.%#,'
       \.'%-G%.%#/lib/ruby/%\\d.%\\d/%.%#,'
-      \.'%-G%.%#/vendor/rails/%.%#,'
+      \.'%-G%.%#/vendor/%.%#,'
       \.'%-G%.%#%\\d%\\d:%\\d%\\d:%\\d%\\d%.%#,'
 " Final catch all for one line errors
 let s:efm=s:efm
