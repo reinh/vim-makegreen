@@ -20,7 +20,7 @@ set cpo&vim
 function s:RunMake() "{{{1
   silent! w
   let s:old_sp = &shellpipe
-  set shellpipe=> "quieter make output
+  set shellpipe=2>&1 "quieter make output
   silent! make %
   let &shellpipe = s:old_sp
 
