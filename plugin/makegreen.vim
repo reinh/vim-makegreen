@@ -20,7 +20,9 @@ set cpo&vim
 function s:RunMake() "{{{1
   silent! w
   let s:old_sp = &shellpipe
-  set shellpipe=&> "quieter make output
+  if has('unix')
+    set shellpipe=&> "quieter make output
+  endif
   silent! make %
   let &shellpipe = s:old_sp
 
