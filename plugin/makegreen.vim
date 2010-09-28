@@ -47,6 +47,9 @@ function s:GetFirstError()
       break
     endif
   endfor
+  if ! error['valid']
+    return ''
+  endif
   let error_message = substitute(error['text'], '^ *', '', 'g')
   let error_message = substitute(error_message, "\n", ' ', 'g')
   let error_message = substitute(error_message, "  *", ' ', 'g')
