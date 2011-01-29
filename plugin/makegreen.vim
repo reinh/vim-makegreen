@@ -17,6 +17,9 @@ let g:makegreen_loaded = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+hi GreenBar term=reverse ctermfg=white ctermbg=green guifg=white guibg=green
+hi RedBar   term=reverse ctermfg=white ctermbg=red guifg=white guibg=red
+
 function s:RunMake() "{{{1
   silent! w
   let s:old_sp = &shellpipe
@@ -57,8 +60,6 @@ function s:GetFirstError()
 endfunction
 
 function s:Bar(type, msg)
-  hi GreenBar term=reverse ctermfg=white ctermbg=green guifg=white guibg=green
-  hi RedBar   term=reverse ctermfg=white ctermbg=red guifg=white guibg=red
   if a:type == "red"
     echohl RedBar
   else
