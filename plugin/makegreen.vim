@@ -17,13 +17,23 @@ let g:makegreen_loaded = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-function s:RunMake() "{{{1
+hi GreenBar term=reverse ctermfg=white ctermbg=green guifg=white guibg=green
+hi RedBar   term=reverse ctermfg=white ctermbg=red guifg=white guibg=red
+
+function MakeGreen(...) "{{{1
+  let arg_count = a:0
+  if arg_count
+    let make_args = a:1
+  else
+    let make_args = '%'
+  endif
+
   silent! w
   let s:old_sp = &shellpipe
   if has('unix')
     set shellpipe=&> "quieter make output
   endif
-  silent! make %
+  silent! exec "make " . make_args
   let &shellpipe = s:old_sp
 
   redraw!
@@ -57,8 +67,6 @@ function s:GetFirstError()
 endfunction
 
 function s:Bar(type, msg)
-  hi GreenBar term=reverse ctermfg=white ctermbg=green guifg=white guibg=green
-  hi RedBar   term=reverse ctermfg=white ctermbg=red guifg=white guibg=red
   if a:type == "red"
     echohl RedBar
   else
@@ -71,11 +79,8 @@ endfunction
 " }}}1
 " Mappings" {{{1
 
-noremap <unique> <script> <Plug>MakeGreen <SID>Make
-noremap <SID>Make :call <SID>RunMake()<CR>
-
-if !hasmapto('<Plug>MakeGreen')
-  map <unique> <silent> <Leader>t <Plug>MakeGreen
+if !hasmapto('MakeGreen')
+  map <unique> <silent> <Leader>t :call MakeGreen()<cr>
 endif
 " }}}1
 

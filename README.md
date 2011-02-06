@@ -55,6 +55,13 @@ this line to your vimrc:
 Then `:make %` (make current file) and MakeGreen will work automatically when
 you are in a spec.
 
+Specifying Make Arguments
+-------------------------
+
+By default, MakeGreen will run `:make %`. If you'd like to pass custom
+arguments to `:make`, bind a key to `call :MakeGreen('my args')`. This will
+also remove the default key mapping.
+
 Credits
 -------
 
