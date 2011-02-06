@@ -77,3 +77,9 @@ Credits
 - elik and godlygeek in #vim on irc.freenode.net for vim help
 
 - Jim Remsik (@jremsikjr on twitter) for debugging and typo fixing.
+
+Contributors
+------------
+
+Rein Henrichs
+Gary Bernhardt
