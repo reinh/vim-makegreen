@@ -29,12 +29,7 @@ function MakeGreen(...) "{{{1
   endif
 
   silent! w " TODO: configuration option?
-  let s:old_sp = &shellpipe
-  if has('unix')
-    set shellpipe=&> "quieter make output
-  endif
   silent! exec "make " . make_args
-  let &shellpipe = s:old_sp
 
   redraw!
 
