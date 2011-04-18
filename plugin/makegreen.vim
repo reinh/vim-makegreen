@@ -28,7 +28,7 @@ function MakeGreen(...) "{{{1
     let make_args = '%'
   endif
 
-  silent! w
+  silent! w " TODO: configuration option?
   let s:old_sp = &shellpipe
   if has('unix')
     set shellpipe=&> "quieter make output
@@ -46,6 +46,7 @@ function MakeGreen(...) "{{{1
   endif
 endfunction
 "}}}1
+"
 " Utility Functions" {{{1
 function s:GetFirstError()
   if getqflist() == []
