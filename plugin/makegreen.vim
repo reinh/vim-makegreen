@@ -29,7 +29,7 @@ function MakeGreen(...) "{{{1
   endif
 
   silent! w " TODO: configuration option?
-  silent! exec "make " . make_args
+  silent! exec "make! " . make_args
 
   redraw!
 
@@ -83,4 +83,5 @@ endif
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
+autocmd QuickFixCmdPost * nested cwindow | cfirst | cclose
 " vim:set sw=2 sts=2:
