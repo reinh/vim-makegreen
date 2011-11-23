@@ -28,8 +28,14 @@ function MakeGreen(...) "{{{1
     let make_args = '%'
   endif
 
-  silent! w " TODO: configuration option?
+  silent! w
+  let s:old_sp = &shellpipe
+  if has('unix')
+    set shellpipe=&> "quieter make output
+  endif
+  " TODO: configuration option? for make! or make
   silent! exec "make! " . make_args
+  let &shellpipe = s:old_sp
 
   redraw!
 
