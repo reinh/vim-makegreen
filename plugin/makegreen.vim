@@ -72,13 +72,6 @@ function s:Bar(type, msg)
   echohl None
 endfunction
 
-" }}}1
-" Mappings" {{{1
-
-if !hasmapto('MakeGreen')
-  map <unique> <silent> <Leader>t :call MakeGreen()<cr>
-endif
-" }}}1
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
