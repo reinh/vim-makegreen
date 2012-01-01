@@ -72,6 +72,7 @@ function s:Bar(type, msg)
   echohl None
 endfunction
 
+:command MakeGreen :call MakeGreen()
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
