@@ -22,14 +22,13 @@ hi RedBar   term=reverse ctermfg=white ctermbg=red guifg=white guibg=red
 
 function MakeGreen(...) "{{{1
   let arg_count = a:0
-  if arg_count
-    let make_args = a:1
-  else
-    let make_args = '%'
-  endif
 
   silent! w " TODO: configuration option?
-  silent! exec "make " . make_args
+  if arg_count
+    silent! exec "make " . a:1
+  else
+    silent! exec "make"
+  endif
 
   redraw!
 
@@ -72,7 +71,7 @@ function s:Bar(type, msg)
   echohl None
 endfunction
 
-:command MakeGreen :call MakeGreen()
+:command -nargs=* MakeGreen :call MakeGreen(<q-args>)
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
