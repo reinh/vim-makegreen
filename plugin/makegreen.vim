@@ -75,8 +75,9 @@ endfunction
 " }}}1
 " Mappings" {{{1
 
-if !hasmapto('MakeGreen')
-  map <unique> <silent> <Leader>t :call MakeGreen()<cr>
+map <silent> <Plug>MakeGreen :call MakeGreen()<cr>
+if !hasmapto('<Plug>MakeGreen')
+  map <Leader>t <Plug>MakeGreen()
 endif
 " }}}1
 
