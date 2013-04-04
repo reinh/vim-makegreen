@@ -1,0 +1,219 @@
+*makegreen.txt*    Strong Visual Indicator for Your TDD Cycle
+
+
+CONTENTS
+===========================================================================
+
+ 1. Introduction                                   |makegreen|
+ 2. Requirements                                   |makegreen-requirements|
+ 3. Installation                                   |makegreen-installation|
+ 4. Usage                                          |makegreen-usage|
+ 5. Mappings                                       |makegreen-mappings|
+ 6. Configuration                                  |makegreen-configuration|
+ 7. Feedback                                       |makegreen-feedback|
+ 8. Credits                                        |makegreen-credits|
+ 9. Contributors                                   |makegreen-contributors|
+10. License                                        |makegreen-license|
+
+
+Introduction                                       *:MakeGreen* *makegreen*
+===========================================================================
+
+MakeGreen runs |:make|. Then it shows a red/green bar in Vim's
+'statusline' indicating the result.
+
+Or put simply: "Strong Visual Indicator for Your TDD Cycle".
+
+
+Requirements                                       *makegreen-requirements*
+===========================================================================
+
+This plugin requires that:
+
+- 'compatible' isn't set.
+
+- Your Vim is compiled with |+quickfix| and |+eval| features. You can use
+  |:version| to find it out.
+
+- One or more |:compiler| for the filetype you're working on. Vim 7.3 now
+  officially ships with 51 compilers. You can search the Internet for more
+  or just write your own. See |write-compiler-plugin|.
+
+
+Installation                                       *makegreen-installation*
+===========================================================================
+
+Copy all files to your ~/.vim directory or use one of the following Vim
+plugin managers like a decent modern Vimmist:
+
+- pathongen: https://github.com/tpope/vim-pathogen
+- Vundle: https://github.com/gmarik/vundle
+- NeoBundle: https://github.com/Shougo/neobundle.vim
+- VAM: https://github.com/MarcWeber/vim-addon-manager
+
+
+Usage                                                     *makegreen-usage*
+===========================================================================
+
+Run Tests in a Single File~
+
+Here's a quick example:
+
+    $ cd <your rails project>
+    $ vim test/unit/user_test.rb
+
+    :compiler rubyunit
+    :MakeGreen %
+
+Expect to see a red/green bar in your 'statusline'. If the test fails,
+you'll see the failure message in the red bar and the cursor would jump to
+the position of the first failure.
+
+A little explanation: the `%` character will expand to the current file
+name (see |c_%|) and will be passed to the rubyunit compiler. Eventually
+rubyunit just executes `testrb test/unit/user_test.rb`.
+
+Run All Tests~
+
+Some compiler (like rspec) runs the entire test suite if no arguments are
+provided. To do that, you can just execute
+
+    :MakeGreen
+
+Run Any Command~
+
+At this moment Vim doesn't propagate exit status of 'makeprg' back.
+MakeGreen can't figure out if failure happens without a proper
+'errorformat' being set. So if you only set 'makeprg' you'll always get
+a green bar. If you have both 'makeprg' and 'errorformat' set to make it
+work, you should consider distributing these two settings as a standalone
+compiler :)
+
+Selecting Compiler~
+
+You can set compiler automatically with the following methods:
+
+- The easiest way is set compiler per filetype. Put the following code in
+  your ~/.vim/ftplugin/ruby.vim:
+>
+      compiler rubyunit
+<
+  will use rubyunit compiler for all your ruby files.
+
+  If you prefer to have all your vim settings in a single ~/.vimrc file, just
+  hook the the |FileType| autocommand event instead:
+>
+      autocmd FileType ruby compiler rubyunit
+<
+
+- If your test files conform to a strict naming convention, make use of it:
+>
+      " In ~/.vimrc
+      autocmd BufNewFile,BufRead *_spec.rb compiler rspec
+<
+  Note: the rspec compiler shipped with Vim is only works with RSpec 1.x.
+  For a modern version working with RSpec 2.x, see:
+
+  https://github.com/vim-ruby/vim-ruby/blob/master/compiler/rspec.vim
+
+- Enable Vim's 'exrc' option to set compiler project-wise. Notice that this
+  introduces potential security leaks. Use with care.
+
+
+Mapping                                                 *makegreen-mapping*
+===========================================================================
+
+There is no default key mapping at the moment. You can define your own
+mapping easily anyway:
+>
+    nmap <leader>t :MakeGreen %<CR>
+<
+Or more conservatively:
+>
+    nnoremap <unique> <leader>t :MakeGreen %<CR>
+<
+
+
+Configuration                                     *makegreen-configuration*
+===========================================================================
+
+Options~
+
+Set the following variable in ~/.vimrc to control the behaviour of
+MakeGreen.
+
+                                                 *g:makegreen_stay_on_file*
+g:makegreen_stay_on_file    booleen (default 0)
+                            If set to 1, cursor won't jump to the first
+                            error when test failed.
+
+Style~
+
+You can configure how the red/green bar looks like with Vim's |:highlight|
+command. But at this moment you have to configure it after the
+plugin/makegreen.vim is loaded. You can make use of vim's |after-directory|
+functionality to achieve this.
+
+An example of ~/.vim/after/plugin/makegreen.vim looks like this:
+>
+    " The green bar looks pretty bright on my terminal.
+    " So I have to set foreground color as black.
+    hi GreenBar term=reverse ctermfg=black ctermbg=green guifg=white guibg=green
+<
+
+                                                              *hl-GreenBar*
+GreenBar      default:
+                term=reverse
+                ctermfg=white ctermbg=green
+                guifg=white guibg=green
+
+              Style used for the green bar.
+
+                                                                *hl-RedBar*
+RedBar        default:
+                term=reverse
+                ctermfg=white ctermbg=red
+                guifg=white guibg=red
+
+              Style used for the red bar.
+
+
+Feedback                                               *makegreen-feedback*
+===========================================================================
+
+Feel free to create an issue at
+https://github.com/reinh/vim-makegreen/issues
+
+
+Credits                                                 *makegreen-credits*
+===========================================================================
+
+- Based on code from the rubytest.vim plugin
+  (http://github.com/reinh/vim-rubytest) but considerably refactored and
+  modified for this more specific purpose.
+
+- Red/Green bar code borrowed from Gary Bernhardt
+  (http://bitbucket.org/garybernhardt/dotfiles/src/tip/.vimrc) and slightly
+  modified for my use. Please do check out Gary's coding videos on his blog
+  for more awesome vim usage (http://blog.extracheese.org/).
+
+- elik and godlygeek in #vim on irc.freenode.net for vim help
+
+- Jim Remsik (@jremsikjr on twitter) for debugging and typo fixing.
+
+
+Contributors                                       *makegreen-contributors*
+===========================================================================
+
+Rein Henrichs
+Gary Bernhardt
+
+
+License                                                 *makegreen-license*
+===========================================================================
+
+MIT license: http://opensource.org/licenses/MIT
+
+
+---------------------------------------------------------------------------
+vim:tw=75:sts:ts=2:ft=help:
